@@ -24,7 +24,7 @@ LiquidCrystal_I2C lcd(0x27,20,4);
 int bluetoothTx = 8;
 int bluetoothRx = 9;
 
-SoftwareSerial bluetooth(bluetoothTx, bluetoothRx);
+SoftwareSerial BluetoothSerial(bluetoothTx, bluetoothRx);
 
 dht DHT;
 #define DHT11_PIN 7
@@ -38,80 +38,28 @@ void setup()
 
   //Iniciamos el serial
   Serial.begin(9600);
-  bluetooth.begin(9600);
+  BluetoothSerial.begin(9600);
   
   while(!Serial){}
   
-    Serial.write("AT sent");
-  delay(500);
-  bluetooth.write("AT+NAME?");
-  delay(500);
-  while (bluetooth.available()) {
-     Serial.write(bluetooth.read());
-   }
-  delay(100);
-  Serial.println("");
+  // Should respond with OK
+  BluetoothSerial.print("AT");
+  waitForResponse();
 
-  bluetooth.write("AT+POWE3");
-  delay(500);
-  while(bluetooth.available()) 
-  {
-    Serial.write(bluetooth.read());
-  }
-  delay(100);
-  Serial.println("");
+  BluetoothSerial.print("AT+UUID?");
+  waitForResponse();   
+  
+  BluetoothSerial.print("AT+CHAR?");
+  waitForResponse();
 
-  delay(500);
-  bluetooth.write("AT+CHAR?");
-  delay(500);
-  while (bluetooth.available()) {
-     Serial.write(bluetooth.read());
-   }
-  delay(100);
-  Serial.println("");
+  BluetoothSerial.print("AT+ADDR?");
+  waitForResponse();  
 
-  delay(500);
-  bluetooth.write("AT+NAMEFlightline"); //Check Status
-  delay(500);
-  while (bluetooth.available()) {
-      Serial.write((char)bluetooth.read());
+  BluetoothSerial.print("AT+VERS?");
+  waitForResponse();  
 
-    }
-
-  Serial.println("");
-  bluetooth.write("AT+CHAR0x2901"); //add charicteristic
-  delay(500);
-  while (bluetooth.available()) {
-      Serial.write(bluetooth.read());
-
-    }
-
-  Serial.println("");
-  bluetooth.write("AT+RELI0"); 
-  delay(500);
-  while (bluetooth.available()) {
-      Serial.write(bluetooth.read());
-    }
-    
-  Serial.println("");
-  bluetooth.write("AT+SHOW1");
-  delay(100);
-  while (bluetooth.available()) {
-      Serial.write(bluetooth.read());
-
-    }
-  Serial.println("");
-
-    Serial.println("");
-  bluetooth.write("AT+VERR?");
-  delay(100);
-  while (bluetooth.available()) {
-      Serial.write(bluetooth.read());
-
-    }
-  Serial.println("");
- 
-
+  BluetoothSerial.print("AT+HELP?");
+  waitForResponse();            
 }
 
 // Function to pass BlueTooth output through to serial port output
@@ -122,7 +70,6 @@ void waitForResponse() {
   }
   Serial.write("\n");
 }
-
 
 void loop()
 { 
@@ -143,13 +90,5 @@ void loop()
     lcd.print("Magtel.es");
   
   //Tiempo de espera para que reinicie el ciclo
-  delay(10000);
-
-  //Escribimos una característica
-  //bluetooth.write("AT+CHAR0x2901"); //add charicteristic
-  delay(100);
-  while (bluetooth.available()) {
-      Serial.write(bluetooth.read());
-    }  
-  
+  delay(10000);  
 }
